@@ -8,6 +8,12 @@ class LabelizerTest < Minitest::Test
       OpenStruct.new i18n_key: :customer
     end
 
+    labelize :state, %w(label_color color icon note description), converter: {
+      label_color: ->(color){
+        "label label-#{color}"
+      },
+    }
+
     attr_reader :state
 
     def initialize(state)
@@ -21,6 +27,8 @@ class LabelizerTest < Minitest::Test
       OpenStruct.new i18n_key: :my_customer
     end
 
+    labelize :my_state, %w(label_color color icon note description)
+
     attr_reader :my_state
 
     def initialize(state)
@@ -32,18 +40,6 @@ class LabelizerTest < Minitest::Test
     ::I18n.load_path = Dir[File.expand_path("../locales/*.yml",__FILE__)]
     ::I18n.default_locale = :ja
     ::I18n.backend.load_translations
-
-    Labelizer.configure do |config|
-      config.labels = %w(label_color color icon note description)
-      config.converter = {
-        label_color: ->(color){
-          "label label-#{color}"
-        }
-      }
-    end
-
-    Customer.labelize :state
-    MyCustomer.labelize :my_state
   end
 
   def test_that_it_has_a_version_number

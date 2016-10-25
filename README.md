@@ -24,9 +24,17 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-# config/initializers/labelizer.rb
-Labelizer.configure do |config|
-  config.labels = %w(label description color)
+# app/models/my_model.rb
+class Customer < ApplicationModel
+  enum registration_state: {
+    starting: 0,
+    confirming: 1,
+    completed: 2,
+  }
+
+  include Labelizer
+
+  labelize :registration_state, %w(label description color)
 end
 ```
 
@@ -48,21 +56,6 @@ ja:
           label: start
           description: registration completed!!
           color: label label-success
-```
-
-```ruby
-# app/models/my_model.rb
-class Customer < ApplicationModel
-  enum registration_state: {
-    starting: 0,
-    confirming: 1,
-    completed: 2,
-  }
-
-  include Labelizer
-
-  labelize :registration_state
-end
 ```
 
 ```erb
@@ -93,15 +86,12 @@ end
 Convert label:
 
 ```ruby
-# config/initializers/labelizer.rb
-Labelizer.configure do |config|
-  config.converter = {
-    color: ->(value){
-      # value : attribute value
-      "label label-#{value}"
-    },
-  }
-end
+labelize :registration_state, %w(label description color), converter: {
+  color: ->(value){
+    # value : attribute value
+    "label label-#{value}"
+  },
+}
 ```
 
 ```yaml
