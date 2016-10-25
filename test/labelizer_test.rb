@@ -83,21 +83,21 @@ class LabelizerTest < Minitest::Test
     assert_equal "global description", labelized["state"]["starting"]["description"]
 
     customer = Customer.new "running"
-    assert_equal "running", customer.state_color
+    assert_equal "", customer.state_color
     assert_equal "state icon", customer.state_icon
     assert_equal "customer note", customer.state_note
     assert_equal "global description", customer.state_description
 
     customer = Customer.new 1
-    assert_equal 1, customer.state_color
+    assert_equal "", customer.state_color
 
     customer = Customer.new nil
-    assert_equal nil, customer.state_color
+    assert_equal "", customer.state_color
 
     customer = MyCustomer.new "state"
-    assert_equal "state", customer.my_state_color
-    assert_equal "state", customer.my_state_icon
-    assert_equal "state", customer.my_state_note
+    assert_equal "", customer.my_state_color
+    assert_equal "", customer.my_state_icon
+    assert_equal "", customer.my_state_note
     assert_equal "global description", customer.my_state_description
   end
 end

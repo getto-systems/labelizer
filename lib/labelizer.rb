@@ -34,10 +34,9 @@ module Labelizer
                 :"labelizer.#{model}.#{attr}.#{label}",
                 :"labelizer.#{model}.#{label}",
                 :"labelizer.#{label}",
-                value,
+                "",
               ],
-              raise: true,
-            ) rescue value
+            )
             if converter = converters && converters[label.to_sym]
               result = converter[result]
             end
