@@ -66,19 +66,38 @@ ja:
 <span class="<%= customer.registration_state_color %>"><%= customer.registration_state_label %></span>
 
 <% labels = customer.registration_state_labelized %>
-<span class="<%= labels[:color] %>"><%= labels[:label] %></span>
+<span class="<%= labels.color %>"><%= labels.label %></span>
+
+<% labels = customer.labelized.registration_state %>
+<span class="<%= labels.color %>"><%= labels.label %></span>
 
 <% labels = customer.labelized[:registration_state] %>
 <span class="<%= labels[:color] %>"><%= labels[:label] %></span>
 
 <%# description %>
 <ul>
-  <%# Customer.registration_states # => define by enum %>
-  <% Customer.registration_states.each do |state,value| %>
-    <% labels = Customer.labelized[:registration_state][state] %>
+  <% Customer.registration_state_labelized.each do |state,labels| %>
+    <li><%= labels.label %> : <%= labels.description %></li>
+  <% end %>
+</ul>
+
+<ul>
+  <% Customer.labelized.registration_state.each do |state,labels| %>
+    <li><%= labels.label %> : <%= labels.description %></li>
+  <% end %>
+</ul>
+
+<ul>
+  <% Customer.labelized[:registration_state].each do |state,labels| %>
     <li><%= labels[:label] %> : <%= labels[:description] %></li>
   <% end %>
 </ul>
+```
+
+```ruby
+Customer.labelized[:unknown_attr] #=> KeyError
+Customer.labelized[:registration_state]["unknown_state"] #=> KeyError
+Customer.labelized[:registration_state]["starting"][:unknown_label_type] #=> KeyError
 ```
 
 ## Converters
@@ -121,17 +140,22 @@ ja:
           color: ...
 ```
 
-## outside rails
+
+## without enum
 
 ```ruby
-class Customer
+class Customer < ApplicationModel
   include Labelizer
 
-  def self.model_name
-    OpenStruct.new i18n_key: :customer
+  def self.registration_states
+    {
+      "starting" => 0,
+      "confirming" => 1,
+      "completed" => 2,
+    }
   end
 
-  labelize ...
+  labelize :registration_state, %w(label description color)
 end
 ```
 
