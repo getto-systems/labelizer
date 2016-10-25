@@ -1,0 +1,13 @@
+ja:
+  labelizer:
+    description: global description
+
+    customer:
+      note: customer note
+
+      state:
+        icon: state icon
+
+        starting:
+          color: starting color
+          label_color: info

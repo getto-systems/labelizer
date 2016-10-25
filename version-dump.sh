@@ -31,8 +31,8 @@ read -p "dump version: $version. OK? [Y/n] " confirm
 case $confirm in
   Y*|y*)
     echo $version > $version_file
-    sed -i '/VERSION.*/VERSION = "'$version'"/' $version_rb
-    git add $version_file && git commit -m "version dump: $version"
+    sed -i 's/VERSION.*/VERSION = "'$version'"/' $version_rb
+    git add $version_file $version_rb && git commit -m "version dump: $version"
     ;;
   *)
     exit 1
