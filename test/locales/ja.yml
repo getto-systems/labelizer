@@ -2,7 +2,7 @@ ja:
   labelizer:
     description: global description
 
-    customer:
+    labelizer_test/customer:
       note: customer note
 
       state:
