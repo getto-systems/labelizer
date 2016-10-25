@@ -1,6 +1,6 @@
 # Labelizer
 
-add labels to enum
+add labels to attribute
 
 ## Installation
 
@@ -23,14 +23,12 @@ Or install it yourself as:
 ```ruby
 # config/initializers/labelizer.rb
 Labelizer.configure do |config|
-  config.file_path = Rails.root("config/labelizer.yml")
-  config.cache = Rails.env.production? # cache yml
   config.labels = %w(label description color)
 end
 ```
 
 ```yaml
-# config/labelizer.yml
+# config/locales/labelizer.ja.yml
 ja:
   labelizer:
     customer:
@@ -38,15 +36,15 @@ ja:
         starting:
           label: start
           description: registration starting...
-          color: info
+          color: label label-info
         confirming:
           label: start
           description: registration confirming...
-          color: warning
+          color: label label-warning
         completed:
           label: start
           description: registration completed!!
-          color: success
+          color: label label-success
 ```
 
 ```ruby
@@ -69,51 +67,81 @@ end
 <% customer = Customer.find id %>
 
 <%# status label %>
-<span class="label label-<%= customer.registration_state_color %>"><%= customer.registration_state_label %></span>
+<span class="<%= customer.registration_state_color %>"><%= customer.registration_state_label %></span>
 
 <% labels = customer.registration_state_labelized %>
-<span class="label label-<%= labels[:color] %>"><%= labels[:label] %></span>
+<span class="<%= labels[:color] %>"><%= labels[:label] %></span>
 
 <% labels = customer.labelized[:registration_state] %>
-<span class="label label-<%= labels[:color] %>"><%= labels[:label] %></span>
-
-<% labels.keys #=> [:value, :label, :description, :color] %>
-<% labels[:value] #=> "starting" or "confirming" or "completed" %>
+<span class="<%= labels[:color] %>"><%= labels[:label] %></span>
 
 <%# description %>
 <ul>
-  <% Customer.registration_state_labelized.each do |state,labels| %>
-    <%# state => "starting" or "confirming" or "completed" %>
-    <li><%= labels[:label] %> : <%= labels[:description] %></li>
-  <% end %>
-</ul>
-
-<ul>
-  <% Customer.labelized[:registration_state].each do |state,labels| %>
-    <%# state => "starting" or "confirming" or "completed" %>
+  <%# Customer.registration_states # => define by enum %>
+  <% Customer.registration_states.each do |state,value| %>
+    <% labels = Customer.labelized[:registration_state][state] %>
     <li><%= labels[:label] %> : <%= labels[:description] %></li>
   <% end %>
 </ul>
 ```
 
-### without enum
+## Converters
+
+Convert label:
 
 ```ruby
-# app/models/my_model.rb
-class Customer
-  def self.registration_states
-    {
-      "starting" => 0,
-      "confirming" => 1,
-      "completed" => 2,
-    }
-  end
-
-  include Labelizer
-
-  labelize :registration_state
+# config/initializers/labelizer.rb
+Labelizer.configure do |config|
+  config.converter = {
+    color: ->(value){
+      # value : attribute value
+      "label label-#{value}"
+    },
+  }
 end
 ```
+
+```yaml
+ja:
+  labelizer:
+    customer:
+      registration_state:
+        starting:
+          color: info
+```
+
+```ruby
+Customer.starting.last.color # => "label label-info"
+```
+
+## default labels
+
+```yaml
+ja:
+  labelizer:
+    color: ... # <= global default
+    customer:
+      color: ... # <= model default
+      registration_state:
+        color: ... # <= attribute default
+        starting:
+          color: ...
+```
+
+## outside rails
+
+```ruby
+class Customer
+  include Labelizer
+
+  def self.model_name
+    OpenStruct.new i18n_key: :customer
+  end
+
+  labelize ...
+end
+```
+
 
 ## Development
 
@@ -123,7 +151,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/getto-systems/labelizer. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/getto-systems/labelizer.
 
 
 ## License
