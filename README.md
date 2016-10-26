@@ -148,11 +148,7 @@ class Customer < ApplicationModel
   include Labelizer
 
   def self.registration_states
-    {
-      "starting" => 0,
-      "confirming" => 1,
-      "completed" => 2,
-    }
+    ["starting", "confirming", "completed"]
   end
 
   labelize :registration_state, %w(label description color)
@@ -167,11 +163,7 @@ class Customer < ApplicationModel
   include Labelizer
 
   def self.roles
-    {
-      "all" => 0,
-      "admin" => 1,
-      "user" => 2,
-    }
+    ["all", "admin", "user"]
   end
 
   labelize :roles, %w(label)
