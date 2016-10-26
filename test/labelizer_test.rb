@@ -10,11 +10,7 @@ class LabelizerTest < Minitest::Test
       }
     end
     def self.roles
-      {
-        "all" => 0,
-        "admin" => 1,
-        "user" => 2,
-      }
+      ["all","admin","user"]
     end
 
     labelize :state, %w(label_color color icon note description), converter: {
@@ -35,9 +31,7 @@ class LabelizerTest < Minitest::Test
     include Labelizer
 
     def self.my_states
-      {
-        "starting" => 0,
-      }
+      ["starting"]
     end
 
     labelize :my_state, %w(label_color color icon note description)
