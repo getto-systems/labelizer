@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["shun"]
   spec.email         = ["shun@getto.systems"]
 
-  spec.summary       = %q{add labels to attribute}
-  spec.description   = %q{add labels to attribute. label, color, or description, etc.}
+  spec.summary       = %q{add labels to enum}
+  spec.description   = %q{add labels to enum. label, color, or description, etc.}
   spec.homepage      = "https://github.com/getto-systems/labelizer"
   spec.license       = "MIT"
 

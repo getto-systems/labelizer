@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/getto-systems/labelizer.svg?branch=master)](https://travis-ci.org/getto-systems/labelizer)
 [![Gem Version](https://badge.fury.io/rb/labelizer.svg)](https://badge.fury.io/rb/labelizer)
 
-add labels to attribute
+add labels to enum
 
 ## Installation
 
