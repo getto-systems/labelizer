@@ -156,6 +156,43 @@ end
 ```
 
 
+## non string values
+
+```ruby
+class Customer < ApplicationModel
+  include Labelizer
+
+  def self.is_checkeds
+    [true,false]
+  end
+  def self.my_flags
+    [1,2,3]
+  end
+
+  labelize :is_checked, %w(label)
+  labelize :my_flag, %w(label)
+end
+```
+
+```yaml
+ja:
+  labelizer:
+    customer:
+      is_checked:
+        "true":
+          label: ...
+        "false":
+          label: ...
+      my_flag:
+        "1":
+          label: ...
+        "2":
+          label: ...
+        "3":
+          label: ...
+```
+
+
 ## array value
 
 ```ruby
