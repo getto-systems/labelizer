@@ -19,3 +19,11 @@ ja:
           note: admin access
         user:
           note: user access
+
+    labelizer_test/my_customer:
+      my_bool:
+        "true":
+          label: my bool label
+      my_int:
+        "1":
+          label: my int label
