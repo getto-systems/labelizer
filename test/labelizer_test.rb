@@ -33,13 +33,21 @@ class LabelizerTest < Minitest::Test
     def self.my_states
       ["starting"]
     end
+    def self.my_bools
+      [true,false]
+    end
 
     labelize :my_state, %w(label_color color icon note description)
+    labelize :my_bool, %w(label)
 
     attr_reader :my_state
 
     def initialize(state)
       @my_state = state
+    end
+
+    def my_bool
+      true
     end
   end
 
@@ -143,5 +151,7 @@ class LabelizerTest < Minitest::Test
     assert_equal "", customer.my_state_icon
     assert_equal "", customer.my_state_note
     assert_equal "global description", customer.my_state_description
+
+    assert_equal "", customer.my_bool_label
   end
 end

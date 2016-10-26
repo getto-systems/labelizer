@@ -22,8 +22,10 @@ module Labelizer
       normalized_keys = @keys
       self.singleton_class.class_eval do
         normalized_keys.each do |key|
-          define_method key do
-            @hash[key]
+          if key.is_a?(Symbol) || key.is_a?(String)
+            define_method key do
+              @hash[key]
+            end
           end
         end
       end
