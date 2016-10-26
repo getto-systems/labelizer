@@ -17,7 +17,53 @@ module Labelizer
 
   module ClassMethods
     def labelized
-      @labelized
+      @labelized ||= Container.new([]){|attr_labelized,attr|
+        model = self.to_s.underscore
+        values = __send__(attr.to_s.pluralize)
+        labelized = Container.new(values, accept_array_key: true){|value_labelized,value|
+          data = labelized.instance_variable_get(:@data)
+          attr_label_types = data[:label_types]
+          attr_converter = data[:converter]
+
+          unless labelized.has_key?(value)
+            Container.new(attr_label_types){|h,label_type|
+              h[label_type] = value.map{|val| value_labelized[val][label_type]}
+            }
+          else
+            value_labelized[value] = Container.new(attr_label_types){|h,label_type|
+              if label_type == :value
+                result = value
+              else
+                result = ::I18n.translate(
+                  "labelizer.#{model}.#{attr}.#{value}.#{label_type}",
+                  default: [
+                    :"labelizer.#{model}.#{attr}.#{label_type}",
+                    :"labelizer.#{model}.#{label_type}",
+                    :"labelizer.#{label_type}",
+                    "",
+                  ],
+                )
+                if c = attr_converter[label_type]
+                  result = c[result]
+                end
+              end
+              h[label_type] = result
+            }
+          end
+        }
+
+        labelized.singleton_class.class_eval do
+          define_method :pluck do |*require_label_types|
+            map{|value,label_type_labelized|
+              require_label_types.map{|require_label_type|
+                label_type_labelized[require_label_type]
+              }
+            }
+          end
+        end
+
+        attr_labelized[attr] = labelized
+      }
     end
 
     private
@@ -38,61 +84,18 @@ module Labelizer
           end
         end
 
-        @labelized ||= Container.new([]){|attr_labelized,attr|
-          model = self.to_s.underscore
-          attr_labelized[attr] = Container.new(__send__(attr.to_s.pluralize), accept_array_key: true){|value_labelized,value|
-            data = attr_labelized[attr].instance_variable_get(:@data)
-            attr_label_types = data[:label_types]
-            attr_converter = data[:converter]
-            unless attr_labelized[attr].has_key?(value)
-              Container.new(attr_label_types){|h,label_type|
-                h[label_type] = value.map{|val| value_labelized[val][label_type]}
-              }
-            else
-              value_labelized[value] = Container.new(attr_label_types){|h,label_type|
-                if label_type == :value
-                  result = value
-                else
-                  result = ::I18n.translate(
-                    "labelizer.#{model}.#{attr}.#{value}.#{label_type}",
-                    default: [
-                      :"labelizer.#{model}.#{attr}.#{label_type}",
-                      :"labelizer.#{model}.#{label_type}",
-                      :"labelizer.#{label_type}",
-                      "",
-                    ],
-                  )
-                  if c = attr_converter[label_type]
-                    result = c[result]
-                  end
-                end
-                h[label_type] = result
-              }
-            end
-          }
-
-          attr_labelized[attr].singleton_class.class_eval do
-            define_method :pluck do |*require_label_types|
-              map{|value,label_type_labelized|
-                require_label_types.map{|require_label_type|
-                  label_type_labelized[require_label_type]
-                }
-              }
-            end
-          end
-          data = attr_labelized[attr].instance_variable_get(:@data)
-          data[:label_types] = label_types
-          data[:converter] = converter
-
-          attr_labelized[attr]
-        }
-
-        @labelized.instance_variable_get(:@keys) << attr_name
-        @labelized.singleton_class.class_eval do
+        labelized.instance_variable_get(:@keys) << attr_name
+        labelized.singleton_class.class_eval do
           define_method attr_name do
-            @hash[attr_name]
+            self[attr_name]
           end
         end
+
+        data = labelized[attr_name].instance_variable_get(:@data)
+        data[:label_types] = label_types
+        data[:converter] = converter
+
+        labelized[attr_name]
       end
   end
 end
