@@ -9,17 +9,26 @@ class LabelizerTest < Minitest::Test
         "starting" => 0,
       }
     end
+    def self.roles
+      {
+        "all" => 0,
+        "admin" => 1,
+        "user" => 2,
+      }
+    end
 
     labelize :state, %w(label_color color icon note description), converter: {
       label_color: ->(color){
         "label label-#{color}"
       },
     }
+    labelize :roles, %w(note)
 
-    attr_reader :state
+    attr_reader :state, :roles
 
-    def initialize(state)
+    def initialize(state: nil, roles: [])
       @state = state
+      @roles = roles
     end
   end
   class MyCustomer
@@ -51,7 +60,7 @@ class LabelizerTest < Minitest::Test
   end
 
   def test_labelizer
-    customer = Customer.new "starting"
+    customer = Customer.new state: "starting", roles: ["all","admin","user"]
     assert_equal "label label-info", customer.state_label_color
     assert_equal "starting color", customer.state_color
     assert_equal "state icon", customer.state_icon
@@ -96,7 +105,7 @@ class LabelizerTest < Minitest::Test
 
     assert_raises(KeyError) { customer.labelized[:unknown] }
 
-    assert_equal %i{state}, customer.labelized.map{|key,label| key}
+    assert_equal %i{state roles}, customer.labelized.map{|key,label| key}
 
     labelized = Customer.labelized
     assert_equal "starting color", labelized.state["starting"].color
@@ -119,6 +128,13 @@ class LabelizerTest < Minitest::Test
     assert_raises(KeyError) { labelized[:unknown] }
 
     assert_equal %w{starting}, labelized.state.map{|key,label| key}
+
+    assert_equal ["full access", "admin access", "user access"], customer.roles_note
+
+    assert_equal %w{all admin user}, labelized.roles.map{|key,label| key}
+
+    assert_equal "full access", labelized.roles["all"].note
+    assert_equal ["admin access", "user access"], labelized.roles[["admin","user"]].note
 
     customer = MyCustomer.new "starting"
     assert_equal "", customer.my_state_color

@@ -11,3 +11,11 @@ ja:
         starting:
           color: starting color
           label_color: info
+
+      roles:
+        all:
+          note: full access
+        admin:
+          note: admin access
+        user:
+          note: user access
