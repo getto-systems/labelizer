@@ -136,6 +136,8 @@ class LabelizerTest < Minitest::Test
     assert_equal [["all","full access"], ["admin","admin access"], ["user","user access"]], labelized.roles.pluck(:value,:note)
     assert_equal [["full access","all"], ["admin access","admin"], ["user access","user"]], labelized.roles.pluck(:note,:value)
 
+    assert_equal 3, labelized.roles.size
+
     customer = MyCustomer.new "starting"
     assert_equal "", customer.my_state_color
     assert_equal "", customer.my_state_icon

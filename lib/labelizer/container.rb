@@ -49,6 +49,9 @@ module Labelizer
     def has_key?(key)
       @keys.include?(key) || @values.include?(key)
     end
+    def size
+      @keys.size
+    end
 
     def each
       @keys.each do |key|
