@@ -62,6 +62,8 @@ class LabelizerTest < Minitest::Test
     assert_equal "global description", customer.state_description
 
     labelized = customer.state_labelized
+    assert_equal "starting", labelized.value
+    assert_equal "starting", labelized[:value]
     assert_equal "starting color", labelized.color
     assert_equal "starting color", labelized[:color]
     assert_equal "state icon", labelized.icon
@@ -73,7 +75,7 @@ class LabelizerTest < Minitest::Test
 
     assert_raises(KeyError) { labelized[:unknown] }
 
-    assert_equal %i{label_color color icon note description}, labelized.map{|key,label| key}
+    assert_equal %i{label_color color icon note description value}, labelized.map{|key,label| key}
 
     labelized = customer.labelized.state
     assert_equal "starting color", labelized.color
@@ -129,6 +131,10 @@ class LabelizerTest < Minitest::Test
 
     assert_equal "full access", labelized.roles["all"].note
     assert_equal ["admin access", "user access"], labelized.roles[["admin","user"]].note
+
+    assert_equal [["customer note","label label-info","global description"]], labelized.state.pluck(:note,:label_color,:description)
+    assert_equal [["all","full access"], ["admin","admin access"], ["user","user access"]], labelized.roles.pluck(:value,:note)
+    assert_equal [["full access","all"], ["admin access","admin"], ["user access","user"]], labelized.roles.pluck(:note,:value)
 
     customer = MyCustomer.new "starting"
     assert_equal "", customer.my_state_color
