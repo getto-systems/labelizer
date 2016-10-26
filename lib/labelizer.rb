@@ -24,6 +24,9 @@ module Labelizer
 
       def labelize(attr_name, label_types, converter: {})
         label_types = label_types.map(&:to_sym)
+        raise ArgumentError, "label types can't include :value" if label_types.include?(:value)
+
+        label_types << :value
 
         define_method :"#{attr_name}_labelized" do
           labelized[attr_name]
@@ -44,22 +47,38 @@ module Labelizer
               }
             else
               value_labelized[value] = Container.new(label_types){|h,label_type|
-                result = ::I18n.translate(
-                  "labelizer.#{model}.#{attr}.#{value}.#{label_type}",
-                  default: [
-                    :"labelizer.#{model}.#{attr}.#{label_type}",
-                    :"labelizer.#{model}.#{label_type}",
-                    :"labelizer.#{label_type}",
-                    "",
-                  ],
-                )
-                if c = converter[label_type]
-                  result = c[result]
+                if label_type == :value
+                  result = value
+                else
+                  result = ::I18n.translate(
+                    "labelizer.#{model}.#{attr}.#{value}.#{label_type}",
+                    default: [
+                      :"labelizer.#{model}.#{attr}.#{label_type}",
+                      :"labelizer.#{model}.#{label_type}",
+                      :"labelizer.#{label_type}",
+                      "",
+                    ],
+                  )
+                  if c = converter[label_type]
+                    result = c[result]
+                  end
                 end
                 h[label_type] = result
               }
             end
           }
+
+          attr_labelized[attr].singleton_class.class_eval do
+            define_method :pluck do |*require_label_types|
+              map{|value,label_type_labelized|
+                require_label_types.map{|require_label_type|
+                  label_type_labelized[require_label_type]
+                }
+              }
+            end
+          end
+
+          attr_labelized[attr]
         }
 
         @labelized.instance_variable_get(:@keys) << attr_name
