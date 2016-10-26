@@ -160,6 +160,74 @@ end
 ```
 
 
+## array value
+
+```ruby
+class Customer < ApplicationModel
+  include Labelizer
+
+  def self.roles
+    {
+      "all" => 0,
+      "admin" => 1,
+      "user" => 2,
+    }
+  end
+
+  labelize :roles, %w(label)
+
+  serialize :roles
+end
+```
+
+```yaml
+ja:
+  labelizer:
+    customer:
+      roles:
+        all:
+          label: full access
+        admin:
+          label: admin access
+        user:
+          label: user access
+```
+
+```ruby
+customer = Customer.find id
+customer.roles #=> ["admin","user"]
+
+customer.roles_label #=> ["admin access", "user access"]
+
+Customer.labelizes.roles.admin.label #=> "admin access"
+Customer.labelizes.roles[["admin","user"]].label #=> ["admin access", "user access"]
+```
+
+
+## nested class
+
+```ruby
+class Namespace::Customer < ApplicationModel
+  include Labelizer
+
+  enum state: {
+    starting: 0,
+  }
+
+  labelize :state, %w(label)
+end
+```
+
+```yaml
+ja:
+  labelizer:
+    namespace/customer:
+      state:
+        starting:
+          label: start
+```
+
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
