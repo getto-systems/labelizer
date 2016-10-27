@@ -17,7 +17,7 @@ git fetch --tags
 current_tag=$(git tag | tail -1)
 
 if [ "v$current_version" != "$current_tag" ]; then
-  read -p "file: '$current_version', tag: '$current_tag'. continue? [Y/n] " confirm
+  read -p "curent: '$current_version', tag: '$current_tag'. continue? [Y/n] " confirm
   case $confirm in
     Y*|y*)
       ;;
