@@ -1,3 +1,3 @@
 module Labelizer
-  VERSION = "0.999.1"
+  VERSION = "1.0.0"
 end
