@@ -107,7 +107,7 @@ Convert label:
 ```ruby
 labelize :registration_state, %w(label description color), converter: {
   color: ->(value){
-    # value : attribute value
+    # value : label value
     "label label-#{value}"
   },
 }
